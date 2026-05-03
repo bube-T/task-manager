@@ -16,7 +16,7 @@ from sqlalchemy.orm import Session
 from app.core.deps import get_db, get_current_user
 from app.core.security import hash_password, verify_password, create_access_token
 from app.models.user import User
-from app.schemas.user import UserCreate, UserOut, Token
+from app.schemas.user import UserCreate, UserOut, Token, PasswordChange
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -88,6 +88,18 @@ def login(form: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get
     # The token is valid for ACCESS_TOKEN_EXPIRE_MINUTES minutes (default: 60).
     token = create_access_token({"sub": str(user.id)})
     return {"access_token": token, "token_type": "bearer"}
+
+
+@router.patch("/password", status_code=204)
+def change_password(
+    body: PasswordChange,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    if not verify_password(body.current_password, current_user.hashed_password):
+        raise HTTPException(status_code=400, detail="Current password is incorrect")
+    current_user.hashed_password = hash_password(body.new_password)
+    db.commit()
 
 
 @router.get("/me", response_model=UserOut)

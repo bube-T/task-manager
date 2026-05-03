@@ -13,19 +13,20 @@
 # code even runs.
 
 from datetime import datetime
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, field_validator
 
 
 # --- Input schema: creating a new user ---
 class UserCreate(BaseModel):
-    # EmailStr is a special Pydantic type that validates the value is a properly
-    # formatted email address. "notanemail" would be rejected with a 422 error.
-    # Requires the email-validator package: pip install pydantic[email]
     email: EmailStr
-
-    # The plain-text password sent by the client. It is immediately hashed in
-    # the register route and never stored or returned as plain text.
     password: str
+
+    @field_validator('password')
+    @classmethod
+    def password_min_length(cls, v: str) -> str:
+        if len(v) < 8:
+            raise ValueError('Password must be at least 8 characters')
+        return v
 
 
 # --- Output schema: what gets returned to the client about a user ---
@@ -39,6 +40,19 @@ class UserOut(BaseModel):
     # instead of only from plain dictionaries.
     # Without this, returning a User ORM object from a route would raise an error.
     model_config = {"from_attributes": True}
+
+
+# --- Input schema: changing password ---
+class PasswordChange(BaseModel):
+    current_password: str
+    new_password: str
+
+    @field_validator('new_password')
+    @classmethod
+    def password_min_length(cls, v: str) -> str:
+        if len(v) < 8:
+            raise ValueError('Password must be at least 8 characters')
+        return v
 
 
 # --- Output schema: the token returned after a successful login ---
