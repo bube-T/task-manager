@@ -3,13 +3,14 @@
 #   uvicorn app.main:app --reload --port 8000
 # It creates the app instance, registers middleware, and mounts all routers.
 
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import auth, tasks
 
 # Create the FastAPI application instance.
 # The title appears in the auto-generated Swagger UI at /docs.
-app = FastAPI(title="Task Manager API")
+app = FastAPI(title="Taska API")
 
 # --- CORS Middleware ---
 # CORS (Cross-Origin Resource Sharing) is a browser security rule.
@@ -17,12 +18,14 @@ app = FastAPI(title="Task Manager API")
 # from making requests to a different origin (e.g. localhost:8000).
 # This middleware adds the correct response headers to tell the browser:
 # "requests from localhost:5173 are allowed — let them through."
+origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173").split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Vite dev server (React frontend)
-    allow_credentials=True,                   # Allow cookies and Authorization headers
-    allow_methods=["*"],                      # Allow all HTTP methods: GET, POST, PATCH, DELETE, etc.
-    allow_headers=["*"],                      # Allow all headers including Authorization
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # --- Routers ---
@@ -39,4 +42,4 @@ app.include_router(tasks.router)
 # Visit http://localhost:8000/ to confirm the API is alive.
 @app.get("/")
 def root():
-    return {"message": "Task Manager API is running"}
+    return {"message": "Taska API is running"}

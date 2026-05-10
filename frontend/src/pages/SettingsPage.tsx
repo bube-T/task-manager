@@ -70,7 +70,7 @@ export default function SettingsPage() {
         {/* Appearance */}
         <section className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
           <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-1">Appearance</h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Choose how TaskManager looks to you.</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Choose how Taska looks to you.</p>
 
           <div className="grid grid-cols-3 gap-3">
             {THEMES.map((t) => (
