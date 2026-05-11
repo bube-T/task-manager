@@ -18,7 +18,8 @@ app = FastAPI(title="Taska API")
 # from making requests to a different origin (e.g. localhost:8000).
 # This middleware adds the correct response headers to tell the browser:
 # "requests from localhost:5173 are allowed — let them through."
-origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173").split(",")
+origins = [o.strip() for o in os.getenv("ALLOWED_ORIGINS", "http://localhost:5173").split(",")]
+print("CORS allowed origins:", origins)
 
 app.add_middleware(
     CORSMiddleware,
