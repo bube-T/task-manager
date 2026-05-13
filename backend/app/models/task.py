@@ -5,7 +5,7 @@
 # This links each task to exactly one user. All task queries filter by
 # owner_id == current_user.id, so users can only ever see their own tasks.
 
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean
 from sqlalchemy.sql import func
 
 # Import Base — the shared parent class all models inherit from.
@@ -55,3 +55,11 @@ class Task(Base):
     # nullable=False means every task must have an owner — orphan tasks are not allowed.
     # When a task is created, owner_id is set to current_user.id automatically in the route.
     owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+
+    # How often this task repeats after completion.
+    # "none" = one-off task. "daily" / "weekly" / "monthly" = auto-creates next occurrence.
+    recurrence = Column(String, default="none", nullable=False, server_default="none")
+
+    # Prevents sending duplicate due-date reminder emails.
+    # Reset to False whenever due_date is updated.
+    reminder_sent = Column(Boolean, default=False, nullable=False, server_default="false")

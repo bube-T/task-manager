@@ -63,6 +63,32 @@ export default function DashboardPage() {
 
   useEffect(() => { fetchAll() }, [fetchAll])
 
+  useEffect(() => {
+    if (!tasks.length || !('Notification' in window)) return
+    const run = async () => {
+      if (Notification.permission === 'denied') return
+      if (Notification.permission === 'default') {
+        const result = await Notification.requestPermission()
+        if (result !== 'granted') return
+      }
+      const key = 'taska_notified'
+      const notified = new Set<number>(JSON.parse(sessionStorage.getItem(key) ?? '[]'))
+      const now = new Date()
+      const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59)
+      tasks
+        .filter(t => t.status !== 'completed' && t.due_date && new Date(t.due_date) <= endOfDay && !notified.has(t.id))
+        .forEach(t => {
+          const isOverdue = new Date(t.due_date!) < now
+          new Notification('Taska', {
+            body: isOverdue ? `"${t.title}" is overdue` : `"${t.title}" is due today`,
+          })
+          notified.add(t.id)
+        })
+      sessionStorage.setItem(key, JSON.stringify([...notified]))
+    }
+    void run()
+  }, [tasks])
+
   const displayedTasks = useMemo(() => {
     const q = search.trim().toLowerCase()
     const filtered = q ? tasks.filter(t => t.title.toLowerCase().includes(q) || t.description?.toLowerCase().includes(q)) : tasks

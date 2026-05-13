@@ -68,10 +68,23 @@ export default function TaskCard({ task, onToggle, onEdit, onDelete }: Props) {
           <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${priorityColors[task.priority]}`}>
             {task.priority}
           </span>
+          {task.recurrence && task.recurrence !== 'none' && (
+            <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400">
+              {task.recurrence}
+            </span>
+          )}
           {task.due_date && (
             <span className={`text-xs ${isOverdue ? 'text-red-500 dark:text-red-400 font-medium' : 'text-gray-400 dark:text-gray-500'}`}>
               Due {new Date(task.due_date).toLocaleDateString()}
               {isOverdue && ' · overdue'}
+            </span>
+          )}
+          {task.note_count > 0 && (
+            <span className="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-0.5">
+              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M7 8h10M7 12h6m-6 4h10M5 4h14a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2z" />
+              </svg>
+              {task.note_count}
             </span>
           )}
         </div>
